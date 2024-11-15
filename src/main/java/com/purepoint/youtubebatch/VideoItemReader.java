@@ -15,6 +15,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -28,10 +31,8 @@ public class VideoItemReader implements ItemReader<Video> {
     private int nextVideoIndex = 0;
     private String pageToken = null;
 
-    private void fetchVideosFromApi() {
-        String query = "자바 강의";
-        String queryEx = " -자바스크립트";
-        String apiUrl = "/youtube/v3/search?part=snippet&type=video&q=" + query + queryEx + "&maxResults=50"
+    private void fetchVideosFromApi(String query, String queryEx) {
+        String apiUrl = "/youtube/v3/search?part=snippet&videoDuration=medium&type=video&q=" + query + queryEx + "&maxResults=50"
                 + (pageToken != null ? "&pageToken=" + pageToken : "")
                 + "&key=" + apiKey;
 
@@ -93,13 +94,29 @@ public class VideoItemReader implements ItemReader<Video> {
 
         pageToken = jsonResponse.has("nextPageToken") ? jsonResponse.get("nextPageToken").getAsString() : null;
         log.info("pageToken: " + pageToken);
-        if(pageToken != null) { fetchVideosFromApi(); }
+        if(pageToken != null) { fetchVideosFromApi(query, queryEx); }
     }
 
     @Override
-    public Video read() {
+    public Video read() throws InterruptedException {
         if (videos.isEmpty()) {
-            fetchVideosFromApi();
+            fetchVideosFromApi("자바 강의", "-자바스크립트");
+
+            sleep(100); // API 호출 대기
+
+            fetchVideosFromApi("파이썬 강의", null);
+
+            sleep(100);
+
+            fetchVideosFromApi("클라우드 강의", null);
+
+            sleep(100);
+
+            fetchVideosFromApi("알고리즘 강의", null);
+
+            sleep(100);
+
+            fetchVideosFromApi("네트워크 강의", null);
         }
         Video nextVideo = null;
         if (nextVideoIndex < videos.size()) {

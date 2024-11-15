@@ -2,7 +2,6 @@ package com.purepoint.youtubebatch.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.scheduling.annotation.Scheduled;
 
 @Entity
 @Table(name = "video")
@@ -28,5 +27,8 @@ public class Video {
 
     @Column(name = "video_thumbnail")
     private String videoThumbnail;
+
+    @Column(name = "video_category")
+    private Integer videoCategory;
 
 }
