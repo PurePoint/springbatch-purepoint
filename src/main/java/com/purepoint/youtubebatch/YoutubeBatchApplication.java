@@ -1,33 +1,32 @@
 package com.purepoint.youtubebatch;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @SpringBootApplication
-@EnableBatchProcessing
-public class YoutubebatchApplication implements CommandLineRunner {
+@EnableScheduling
+@Slf4j
+public class YoutubeBatchApplication {
 
     @Autowired
     private JobLauncher jobLauncher;
     @Autowired
     private Job youtubeApiJob;
-    @Autowired
-    private ApplicationContext applicationContext;
 
     public static void main(String[] args) {
-        SpringApplication.run(YoutubebatchApplication.class, args);
+        SpringApplication.run(YoutubeBatchApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    @Scheduled(cron = "0 0 1 * * *")
+    public void scheduleJob() {
         try {
             // Job Parameters 설정
             JobParameters jobParameters = new JobParametersBuilder()
@@ -37,10 +36,9 @@ public class YoutubebatchApplication implements CommandLineRunner {
             // Job 실행
             jobLauncher.run(youtubeApiJob, jobParameters);
 
-            // Job 완료 후 애플리케이션 종료
-            SpringApplication.exit(applicationContext, () -> 0);
+            log.info("Job executed successfully at 1 AM");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("Exception occurred", e);
         }
     }
 }
