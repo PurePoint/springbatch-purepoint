@@ -1,6 +1,7 @@
 # springbatch-purepoint
 
 **테스트 방법**
+
 src/test/com/purepoint/youtubebatch/BatchTest 의 testScheduleJob을 실행시켜주면 된다.
 
 *주의*
