@@ -1,6 +1,7 @@
 package com.purepoint.youtubebatch;
 
-import com.purepoint.youtubebatch.domain.Youtube;
+import com.purepoint.youtubebatch.domain.Video;
+import com.purepoint.youtubebatch.domain.VideoPlaylist;
 import com.purepoint.youtubebatch.playlist.PlaylistItemProcessor;
 import com.purepoint.youtubebatch.playlist.PlaylistItemReader;
 import com.purepoint.youtubebatch.playlist.PlaylistItemWriter;
@@ -20,16 +21,38 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class BatchConfiguration {
 
+
+    /**
+     * YouTube API 데이터를 처리하는 두 가지 단계(`youtubeVideoStep` 및 `youtubePlaylistStep`)로 구성된
+     * Spring Batch Job을 정의합니다. 이 Job은 완료 알림을 위한 Listener와 연동됩니다.
+     *
+     * @param jobRepository Job 실행 및 구성을 위한 저장소
+     * @param step1 Job의 첫 번째 단계로, YouTube 동영상 관련 데이터를 처리
+     * @param step2 Job의 두 번째 단계로, YouTube 재생목록 관련 데이터를 처리
+     * @param listener Job 완료 시 알림을 제공하는 Listener
+     * @return "youtubeApiJob"이라는 이름의 구성된 Job 인스턴스
+     */
     @Bean
     public Job youtubeApiJob(JobRepository jobRepository, @Qualifier("youtubeVideoStep") Step step1,
                              @Qualifier("youtubePlaylistStep") Step step2,JobCompletionNotificationListener listener) {
         return new JobBuilder("youtubeApiJob", jobRepository)
                 .listener(listener)
-                .start(step1)
-                .next(step2)
+//                .start(step1)
+                .start(step2)
                 .build();
     }
 
+    /**
+     * YouTube 동영상 데이터를 처리하는 Batch Step을 정의합니다.
+     * 데이터는 Reader, Processor, Writer의 3단계로 처리되며, 트랜잭션 관리를 포함합니다.
+     *
+     * @param jobRepository Job 실행 및 구성을 위한 저장소
+     * @param transactionManager 트랜잭션 관리 매니저
+     * @param videoItemReader YouTube 동영상 데이터를 읽어오는 Reader
+     * @param videoItemProcessor YouTube 동영상 데이터를 가공하는 Processor
+     * @param videoItemWriter 처리된 데이터를 저장하는 Writer
+     * @return "youtubeVideoStep"이라는 이름의 구성된 Step 인스턴스
+     */
     @Bean
     public Step youtubeVideoStep(JobRepository jobRepository,
                                PlatformTransactionManager transactionManager,
@@ -38,7 +61,7 @@ public class BatchConfiguration {
                                VideoItemWriter videoItemWriter
                                ) {
         return new StepBuilder("youtubeVideoStep", jobRepository)
-                .<Youtube, Youtube>chunk(10, transactionManager)
+                .<Video, Video>chunk(10, transactionManager)
                 .reader(videoItemReader)
                 .processor(videoItemProcessor)
                 .writer(videoItemWriter)
@@ -60,6 +83,17 @@ public class BatchConfiguration {
         return new VideoItemWriter();
     }
 
+    /**
+     * YouTube 재생목록 데이터를 처리하는 Batch Step을 정의합니다.
+     * 데이터는 Reader, Processor, Writer의 3단계로 처리되며, 트랜잭션 관리를 포함합니다.
+     *
+     * @param jobRepository Job 실행 및 구성을 위한 저장소
+     * @param transactionManager 트랜잭션 관리 매니저
+     * @param playlistItemReader YouTube 재생목록 데이터를 읽어오는 Reader
+     * @param playlistItemProcessor YouTube 재생목록 데이터를 가공하는 Processor
+     * @param playlistItemWriter 처리된 데이터를 저장하는 Writer
+     * @return "youtubePlaylistStep"이라는 이름의 구성된 Step 인스턴스
+     */
     @Bean
     public Step youtubePlaylistStep(JobRepository jobRepository,
                                PlatformTransactionManager transactionManager,
@@ -68,7 +102,7 @@ public class BatchConfiguration {
                                PlaylistItemWriter playlistItemWriter
     ) {
         return new StepBuilder("youtubePlaylistStep", jobRepository)
-                .<Youtube, Youtube>chunk(10, transactionManager)
+                .<VideoPlaylist, VideoPlaylist>chunk(10, transactionManager)
                 .reader(playlistItemReader)
                 .processor(playlistItemProcessor)
                 .writer(playlistItemWriter)

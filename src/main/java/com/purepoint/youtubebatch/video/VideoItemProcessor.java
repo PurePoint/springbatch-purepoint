@@ -1,18 +1,18 @@
 package com.purepoint.youtubebatch.video;
 
-import com.purepoint.youtubebatch.domain.Youtube;
+import com.purepoint.youtubebatch.domain.Video;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class VideoItemProcessor implements ItemProcessor<Youtube, Youtube> {
+public class VideoItemProcessor implements ItemProcessor<Video, Video> {
 
     @Autowired
     private VideoRepository videoRepository;
 
     @Override
-    public Youtube process(Youtube video) throws Exception {
+    public Video process(Video video) throws Exception {
         // DB에 이미 존재하는지 검증
-        if (videoRepository.existsById(video.getItemId())) {
+        if (videoRepository.existsById(video.getVideoId())) {
             return null;
         }
         

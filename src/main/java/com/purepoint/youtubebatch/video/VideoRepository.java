@@ -1,7 +1,7 @@
 package com.purepoint.youtubebatch.video;
 
-import com.purepoint.youtubebatch.domain.Youtube;
+import com.purepoint.youtubebatch.domain.Video;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface VideoRepository extends JpaRepository<Youtube, String> {
+public interface VideoRepository extends JpaRepository<Video, String> {
 }
