@@ -19,14 +19,16 @@ public class YoutubeBatchApplication {
     @Autowired
     private JobLauncher jobLauncher;
     @Autowired
-    private Job youtubeApiJob;
+    private Job youtubeApiJob1;
+    @Autowired
+    private Job youtubeApiJob2;
 
     public static void main(String[] args) {
         SpringApplication.run(YoutubeBatchApplication.class, args);
     }
 
-    @Scheduled(cron = "0 0 1 * * *")
-    public void scheduleJob() {
+    @Scheduled(cron = "0 0 1 * * Mon")
+    public void scheduleJob1() {
         try {
             // Job Parameters 설정
             JobParameters jobParameters = new JobParametersBuilder()
@@ -34,7 +36,24 @@ public class YoutubeBatchApplication {
                     .toJobParameters();
 
             // Job 실행
-            jobLauncher.run(youtubeApiJob, jobParameters);
+            jobLauncher.run(youtubeApiJob1, jobParameters);
+
+            log.info("Job executed successfully at 1 AM");
+        } catch (Exception e) {
+            log.info("Exception occurred", e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 1 * * Tue")
+    public void scheduleJob2() {
+        try {
+            // Job Parameters 설정
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("timestamp", System.currentTimeMillis())
+                    .toJobParameters();
+
+            // Job 실행
+            jobLauncher.run(youtubeApiJob2, jobParameters);
 
             log.info("Job executed successfully at 1 AM");
         } catch (Exception e) {

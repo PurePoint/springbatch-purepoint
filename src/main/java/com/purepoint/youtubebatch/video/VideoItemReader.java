@@ -41,19 +41,19 @@ public class VideoItemReader implements ItemReader<Video> {
 
             sleep(100); // API 호출 대기
 
-            fetchVideosFromApi("파이썬 강의", null);
+            fetchVideosFromApi("파이썬 강의", "");
 
             sleep(100);
 
-            fetchVideosFromApi("클라우드 강의", null);
+            fetchVideosFromApi("클라우드 강의", "");
 
             sleep(100);
 
-            fetchVideosFromApi("알고리즘 강의", null);
+            fetchVideosFromApi("알고리즘 강의", "");
 
             sleep(100);
 
-            fetchVideosFromApi("네트워크 강의", null);
+            fetchVideosFromApi("네트워크 강의", "");
         }
         Video nextVideo = null;
         if (nextVideoIndex < videos.size()) {

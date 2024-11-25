@@ -39,10 +39,11 @@ public class Video {
     @Column(name = "video_position")
     private Integer videoPosition;
 
-    @Column(name = "playlist_id")
+    @Column(name = "playlist_id", nullable = false)
     private String playlistId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "playlist_id", referencedColumnName = "playlist_id", insertable = false, updatable = false)
-    private Playlist playlist;
+//    // `Playlist`와의 연관 관계 매핑
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "playlist_id", insertable = false, updatable = false) // `playlistId` 필드 사용
+//    private Playlist playlist;
 }

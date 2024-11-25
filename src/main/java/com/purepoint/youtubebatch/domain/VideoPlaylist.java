@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@Builder
 public class VideoPlaylist {
     private Video video;
     private Playlist playlist;

@@ -32,7 +32,6 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
     private TokenRepository tokenRepository;
     @Value("${youtube.api.key}")
     private String apiKey;
-
     @Autowired
     private WebClient webClient;
     private final List<Playlist> playlists = new ArrayList<>();
@@ -44,25 +43,25 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
     @Override
     public VideoPlaylist read() throws InterruptedException {
         if (playlists.isEmpty()) {
-            fetchPlaylistFromApi("자바 강의", "-자바스크립트");
+//            fetchPlaylistFromApi("자바 강의", "");
+//
+//            sleep(1000); // API 호출 대기
+//
+//            fetchPlaylistFromApi("파이썬 강의", "");
+//
+//            sleep(1000);
 
-            sleep(1000); // API 호출 대기
-
-            fetchPlaylistFromApi("파이썬 강의", null);
-
-            sleep(1000);
-
-            fetchPlaylistFromApi("클라우드 강의", null);
-
-            sleep(1000);
-
-            fetchPlaylistFromApi("알고리즘 강의", null);
+            fetchPlaylistFromApi("클라우드 강의", "");
 
             sleep(1000);
 
-            fetchPlaylistFromApi("네트워크 강의", null);
-
-            sleep(1000);
+//            fetchPlaylistFromApi("알고리즘 강의", "");
+//
+//            sleep(1000);
+//
+//            fetchPlaylistFromApi("네트워크 강의", "");
+//
+//            sleep(1000);
 
             int count = 0;
             // 재생목록 별로 영상을 가져옴
@@ -74,16 +73,32 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
         }
 
         VideoPlaylist nextItem = null;
+        log.info("playlist.size(): {}, video.size(): {}", playlists.size(), videos.size());
+
+        // playlist를 읽어오는 부분
 
         if (nextVideoIndex < playlists.size()) {
             Playlist currentPlaylist = playlists.get(nextVideoIndex);
+            log.info("currentPlaylist: {}", currentPlaylist);
             Video firstVideo = getFirstVideoForPlaylist(currentPlaylist);
-            nextItem = new VideoPlaylist(firstVideo, currentPlaylist);
+            log.info("firstVideo: {}", firstVideo);
+//            nextItem = VideoPlaylist.builder()
+//                    .video(firstVideo)
+//                    .playlist(currentPlaylist)
+//                    .build();
+//            log.info("nextItem: {}", nextItem);
             nextVideoIndex++;
+
+        // video를 읽어오는 부분
         } else if (nextVideoIndex - playlists.size() < videos.size()) {
             Video currentVideo = videos.get(nextVideoIndex - playlists.size());
             Playlist associatedPlaylist = getPlaylistForVideo(currentVideo);
-            nextItem = new VideoPlaylist(currentVideo, associatedPlaylist);
+            log.info("associatedPlaylist: {}", associatedPlaylist);
+//            nextItem = VideoPlaylist.builder()
+//                    .video(currentVideo)
+//                    .playlist(associatedPlaylist)
+//                    .build();
+//            log.info("nextItem: {}", nextItem);
             nextVideoIndex++;
         }
 
@@ -92,7 +107,7 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
 
     private void fetchPlaylistFromApi(String query, String queryEx) {
         String part = "?part=snippet";
-        String queryParam = "q=" + query + queryEx + "&type=playlist";
+        String queryParam = "q=" + query + queryEx + "&type=playlist&order=relevance";
         fetchPlaylistsFromApi(part, queryParam, playlists);
     }
 
@@ -123,7 +138,7 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
 
         String apiUrl = "https://www.googleapis.com/youtube/v3/" + "search" + part
                 + (queryParam != null ? "&" + queryParam : "")
-                + "&maxResults=50"
+                + "&maxResults=10"
                 + (pageToken != null ? "&pageToken=" + pageToken : "")
                 + "&key=" + apiKey;
 
@@ -179,7 +194,7 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
     }
 
     private void fetchVideosFromApi(String part, String queryParam, List<Video> videos) {
-        String nextpageToken;
+        String nextpageToken = null;
         String videoId = null;
         String playlistId = null;
         Integer position = 0;
@@ -188,8 +203,10 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
             String apiUrl = "https://www.googleapis.com/youtube/v3/" + "playlistItems" + part
                     + (queryParam != null ? "&" + queryParam : "")
                     + "&maxResults=50"
-                    + (pageToken != null ? "&pageToken=" + pageToken : "")
+                    + (nextpageToken != null ? "&pageToken=" + nextpageToken : "")
                     + "&key=" + apiKey;
+
+            log.info("Generated API URL: " + apiUrl);
 
             String response = webClient
                     .method(HttpMethod.GET)
@@ -274,7 +291,9 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
             video = Video.builder()
                     // videoId
                     .videoId(videoId)
+                    // playlistId
                     .playlistId(playlistId)
+                    // position
                     .videoPosition(position)
                     // kind
                     .videoKind(videoItem.has("kind") ? videoItem.get("kind").getAsString() : null)
@@ -294,6 +313,7 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
     }
 
     private Video getFirstVideoForPlaylist(Playlist playlist) {
+
         return videos.stream()
                 .filter(video -> playlist.getPlaylistId().equals(video.getPlaylistId())) // Playlist ID 비교
                 .findFirst()
@@ -301,6 +321,7 @@ public class PlaylistItemReader implements ItemReader<VideoPlaylist> {
     }
 
     private Playlist getPlaylistForVideo(Video video) {
+
         return playlists.stream()
                 .filter(playlist -> playlist.getPlaylistId().equals(video.getPlaylistId())) // Playlist ID 비교
                 .findFirst()

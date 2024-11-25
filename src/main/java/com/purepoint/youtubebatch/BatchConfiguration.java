@@ -23,22 +23,42 @@ public class BatchConfiguration {
 
 
     /**
-     * YouTube API 데이터를 처리하는 두 가지 단계(`youtubeVideoStep` 및 `youtubePlaylistStep`)로 구성된
+     * YouTube API 데이터를 처리하는 `youtubeVideoStep`로 구성된
      * Spring Batch Job을 정의합니다. 이 Job은 완료 알림을 위한 Listener와 연동됩니다.
      *
      * @param jobRepository Job 실행 및 구성을 위한 저장소
-     * @param step1 Job의 첫 번째 단계로, YouTube 동영상 관련 데이터를 처리
-     * @param step2 Job의 두 번째 단계로, YouTube 재생목록 관련 데이터를 처리
+     * @param step YouTube 동영상 관련 데이터를 처리
      * @param listener Job 완료 시 알림을 제공하는 Listener
-     * @return "youtubeApiJob"이라는 이름의 구성된 Job 인스턴스
+     * @return "youtubeApiJob1"이라는 이름의 구성된 Job 인스턴스
      */
+
     @Bean
-    public Job youtubeApiJob(JobRepository jobRepository, @Qualifier("youtubeVideoStep") Step step1,
-                             @Qualifier("youtubePlaylistStep") Step step2,JobCompletionNotificationListener listener) {
-        return new JobBuilder("youtubeApiJob", jobRepository)
+    public Job youtubeApiJob1(JobRepository jobRepository,
+                              @Qualifier("youtubeVideoStep") Step step,
+                              JobCompletionNotificationListener listener) {
+        return new JobBuilder("youtubeApiJob1", jobRepository)
                 .listener(listener)
-//                .start(step1)
-                .start(step2)
+                .start(step)
+                .build();
+    }
+
+    /**
+     * YouTube API 데이터를 처리하는 `youtubePlaylistStep`로 구성된
+     * Spring Batch Job을 정의합니다. 이 Job은 완료 알림을 위한 Listener와 연동됩니다.
+     *
+     * @param jobRepository Job 실행 및 구성을 위한 저장소
+     * @param step YouTube 재생목록 관련 데이터를 처리
+     * @param listener Job 완료 시 알림을 제공하는 Listener
+     * @return "youtubeApiJob2"이라는 이름의 구성된 Job 인스턴스
+     */
+
+    @Bean
+    public Job youtubeApiJob2(JobRepository jobRepository,
+                             @Qualifier("youtubePlaylistStep") Step step,
+                              JobCompletionNotificationListener listener) {
+        return new JobBuilder("youtubeApiJob2", jobRepository)
+                .listener(listener)
+                .start(step)
                 .build();
     }
 
@@ -90,7 +110,7 @@ public class BatchConfiguration {
      * @param jobRepository Job 실행 및 구성을 위한 저장소
      * @param transactionManager 트랜잭션 관리 매니저
      * @param playlistItemReader YouTube 재생목록 데이터를 읽어오는 Reader
-     * @param playlistItemProcessor YouTube 재생목록 데이터를 가공하는 Processor
+//     * @param playlistItemProcessor YouTube 재생목록 데이터를 가공하는 Processor
      * @param playlistItemWriter 처리된 데이터를 저장하는 Writer
      * @return "youtubePlaylistStep"이라는 이름의 구성된 Step 인스턴스
      */
@@ -98,13 +118,13 @@ public class BatchConfiguration {
     public Step youtubePlaylistStep(JobRepository jobRepository,
                                PlatformTransactionManager transactionManager,
                                PlaylistItemReader playlistItemReader,
-                               PlaylistItemProcessor playlistItemProcessor,
+//                               PlaylistItemProcessor playlistItemProcessor,
                                PlaylistItemWriter playlistItemWriter
     ) {
         return new StepBuilder("youtubePlaylistStep", jobRepository)
                 .<VideoPlaylist, VideoPlaylist>chunk(10, transactionManager)
                 .reader(playlistItemReader)
-                .processor(playlistItemProcessor)
+//                .processor(playlistItemProcessor)
                 .writer(playlistItemWriter)
                 .build();
     }

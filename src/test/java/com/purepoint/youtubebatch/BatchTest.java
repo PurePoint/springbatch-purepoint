@@ -21,16 +21,22 @@ public class BatchTest {
     private TokenRepository tokenRepository;
 
     @Test
-    @DisplayName("스프링 배치 수동 테스트")
-    void testScheduleJob() {
-        youtubeBatchApplication.scheduleJob();
+    @DisplayName("유튜브 videos 수동 테스트")
+    void testScheduleJob1() {
+        youtubeBatchApplication.scheduleJob1();
+    }
+
+    @Test
+    @DisplayName("유튜브 playlists 수동 테스트")
+    void testScheduleJob2() {
+        youtubeBatchApplication.scheduleJob2();
     }
 
     @Test
     @DisplayName("토큰 get 테스트")
     void testGetToken() {
-        List<String> token = tokenRepository.findPageTokenByQuery("aaa");
-        log.info("getPageToken" + token.get(0));
+        List<String> token = tokenRepository.findPageTokenByQuery("test");
+        log.info("getPageToken: " + token.get(0));
 
     }
 }
