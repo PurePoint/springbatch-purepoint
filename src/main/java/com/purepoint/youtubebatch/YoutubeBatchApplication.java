@@ -1,5 +1,6 @@
 package com.purepoint.youtubebatch;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -14,14 +15,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 @SpringBootApplication
 @EnableScheduling
 @Slf4j
+@RequiredArgsConstructor
 public class YoutubeBatchApplication {
 
-    @Autowired
-    private JobLauncher jobLauncher;
-    @Autowired
-    private Job youtubeApiJob1;
-    @Autowired
-    private Job youtubeApiJob2;
+    private final JobLauncher jobLauncher;
+    private final Job youtubeApiJob1;
+    private final Job youtubeApiJob2;
 
     public static void main(String[] args) {
         SpringApplication.run(YoutubeBatchApplication.class, args);

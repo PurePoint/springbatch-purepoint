@@ -1,22 +1,24 @@
 package com.purepoint.youtubebatch.playlist;
 
-import com.purepoint.youtubebatch.domain.VideoPlaylist;
+import com.purepoint.youtubebatch.domain.Playlist;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public class PlaylistItemProcessor implements ItemProcessor<VideoPlaylist, VideoPlaylist> {
+@Component
+@RequiredArgsConstructor
+public class PlaylistItemProcessor implements ItemProcessor<Playlist, Playlist> {
 
-    @Autowired
-    private PlaylistRepository playlistRepository;
+    private final PlaylistRepository playlistRepository;
 
     @Override
-    public VideoPlaylist process(VideoPlaylist videoPlaylist) throws Exception {
+    public Playlist process(Playlist playlist) throws Exception {
 
         // DB에 이미 존재하는지 검증
-        if (playlistRepository.existsById(videoPlaylist.getPlaylist().getPlaylistId())) {
+        if (playlistRepository.existsById(playlist.getPlaylistId())) {
             return null;
         }
 
-        return videoPlaylist;
+        return playlist;
     }
 }

@@ -7,7 +7,6 @@ import com.purepoint.youtubebatch.domain.Video;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -27,9 +26,7 @@ public class VideoItemReader implements ItemReader<Video> {
 
     @Value("${youtube.api.key}")
     private String apiKey;
-
-    @Autowired
-    private WebClient webClient;
+    private final WebClient webClient;
     private final List<Video> videos = new ArrayList<>();
     private int nextVideoIndex = 0;
     private String pageToken = null;

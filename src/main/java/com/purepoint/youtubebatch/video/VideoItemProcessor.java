@@ -1,13 +1,15 @@
 package com.purepoint.youtubebatch.video;
 
 import com.purepoint.youtubebatch.domain.Video;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class VideoItemProcessor implements ItemProcessor<Video, Video> {
 
-    @Autowired
-    private VideoRepository videoRepository;
+    private final VideoRepository videoRepository;
 
     @Override
     public Video process(Video video) throws Exception {
