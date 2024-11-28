@@ -100,7 +100,7 @@ public class YoutubeApiTest {
 
                 // playlistId를 사용해 모든 영상 가져오기
                 String nextPageToken = null;
-                do {
+//                do {
                     YouTube.PlaylistItems.List playlistItemsRequest = youtubeService.playlistItems().list("snippet");
                     playlistItemsRequest.setKey(apiKey);
                     playlistItemsRequest.setPlaylistId(playlistId);
@@ -111,24 +111,25 @@ public class YoutubeApiTest {
                     List<PlaylistItem> items = playlistItemsResponse.getItems();
 
                     for (PlaylistItem item : items) {
-                        videoTitles.add("영상 제목: " + item.getSnippet().getTitle());
-
-                        if(item.getSnippet().getThumbnails().getDefault() != null) {
-                            videoTitles.add("영상 썸네일: " + item.getSnippet().getThumbnails().getDefault().getUrl());
-                        }
-
-                        videoTitles.add("플레이리스트 ID: " + item.getSnippet().getPlaylistId());
-                        videoTitles.add("영상 ID: " + item.getSnippet().getResourceId().getVideoId());
+                        log.info("item: " + item);
+//                        videoTitles.add("영상 제목: " + item.getSnippet().getTitle());
+//
+//                        if(item.getSnippet().getThumbnails().getDefault() != null) {
+//                            videoTitles.add("영상 썸네일: " + item.getSnippet().getThumbnails().getDefault().getUrl());
+//                        }
+//
+//                        videoTitles.add("플레이리스트 ID: " + item.getSnippet().getPlaylistId());
+//                        videoTitles.add("영상 ID: " + item.getSnippet().getResourceId().getVideoId());
                     }
 
-                    nextPageToken = playlistItemsResponse.getNextPageToken();
-                } while (nextPageToken != null);
+//                    nextPageToken = playlistItemsResponse.getNextPageToken();
+//                } while (nextPageToken != null);
 
-                playlistVideosMap.put("플레이리스트 제목: " + playlist.getSnippet().getTitle(), videoTitles);
+//                playlistVideosMap.put("플레이리스트 제목: " + playlist.getSnippet().getTitle(), videoTitles);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log.info("결과: " + playlistVideosMap);
+//        log.info("결과: " + playlistVideosMap);
     }
 }

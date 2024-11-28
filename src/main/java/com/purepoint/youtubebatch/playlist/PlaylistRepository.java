@@ -15,7 +15,7 @@ public interface PlaylistRepository extends JpaRepository<Playlist, String> {
                 FROM playlist p
             ) sub
             ORDER BY rownum DESC
-            LIMIT 10
+            LIMIT 50
         """, nativeQuery = true)
     List<String> findPlaylistIdBy();
 }

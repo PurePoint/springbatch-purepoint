@@ -27,7 +27,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class BatchConfiguration {
 
     private final JobRepository jobRepository;
-    private final JobCompletionNotificationListener listener;
+    private final JobCompletionNotificationListener jobCompletionNotificationListener;
     private final PlatformTransactionManager transactionManager;
     private final VideoItemReader videoItemReader;
     private final VideoItemProcessor videoItemProcessor;
@@ -49,7 +49,7 @@ public class BatchConfiguration {
     @Bean
     public Job youtubeApiJob1(@Qualifier("youtubeVideoStep") Step step) {
         return new JobBuilder("youtubeApiJob1", jobRepository)
-                .listener(listener)
+                .listener(jobCompletionNotificationListener)
                 .start(step)
                 .build();
     }
@@ -81,7 +81,7 @@ public class BatchConfiguration {
     public Job youtubeApiJob2(@Qualifier("youtubePlaylistStep") Step step1,
                               @Qualifier("youtubePlaylistVideoStep") Step step2) {
         return new JobBuilder("youtubeApiJob2", jobRepository)
-                .listener(listener)
+                .listener(jobCompletionNotificationListener)
                 .start(step1)
                 .next(step2)
                 .build();
@@ -112,10 +112,11 @@ public class BatchConfiguration {
     @Bean
     public Step youtubePlaylistVideoStep() {
         return new StepBuilder("youtubePlaylistVideoStep", jobRepository)
-                .<Video, Video>chunk(10, transactionManager)
+                .<Video, Video>chunk(100, transactionManager)
                 .reader(playlistVideoItemReader)
                 .processor(playlistVideoItemProcessor)
                 .writer(playlistVideoItemWriter)
                 .build();
     }
+
 }

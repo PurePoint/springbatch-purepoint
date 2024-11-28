@@ -37,7 +37,7 @@ public class YoutubeBatchApplication {
             // Job 실행
             jobLauncher.run(youtubeApiJob1, jobParameters);
 
-            log.info("Job executed successfully at 1 AM");
+            log.info("scheduleJob1 executed successfully");
         } catch (Exception e) {
             log.info("Exception occurred", e);
         }
@@ -54,7 +54,7 @@ public class YoutubeBatchApplication {
             // Job 실행
             jobLauncher.run(youtubeApiJob2, jobParameters);
 
-            log.info("Job executed successfully at 1 AM");
+            log.info("scheduleJob2 executed successfully");
         } catch (Exception e) {
             log.info("Exception occurred", e);
         }

@@ -39,8 +39,12 @@ public class Video {
     @Column(name = "video_position")
     private Integer videoPosition;
 
-    @Column(name = "playlist_id", nullable = false)
+    @Column(name = "playlist_id")
     private String playlistId;
+
+    @Column(name = "video_likes")
+    @Builder.Default
+    private Long videoLikes = 0L;
 
 //    // `Playlist`와의 연관 관계 매핑
 //    @ManyToOne(fetch = FetchType.LAZY)
