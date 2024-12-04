@@ -137,9 +137,13 @@ public class PlaylistItemReader implements ItemReader<Playlist> {
                             ZonedDateTime.parse(snippet.get("publishedAt").getAsString()).toLocalDateTime() : null)
                     // thumbnails 예외처리
                     .playlistThumbnail((snippet != null && snippet.has("thumbnails")
-                            && snippet.getAsJsonObject("thumbnails").has("high")
-                            && snippet.getAsJsonObject("thumbnails").getAsJsonObject("high").has("url")) ?
-                            snippet.getAsJsonObject("thumbnails").getAsJsonObject("high").get("url").getAsString() : null)
+                            && snippet.getAsJsonObject("thumbnails").has("medium")
+                            && snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").has("url")) ?
+                            snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get("url").getAsString() : null)
+                    // channelId 예외처리
+                    .channelId(snippet != null && snippet.has("channelId") ? snippet.get("channelId").getAsString() : null)
+                    // channelTitle 예외처리
+                    .channelTitle(snippet != null && snippet.has("channelTitle") ? snippet.get("channelTitle").getAsString() : null)
                     .build();
 
             log.info("playlistId: " + idObject.get("playlistId").getAsString());

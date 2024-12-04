@@ -8,14 +8,14 @@ import java.util.List;
 
 public interface PlaylistRepository extends JpaRepository<Playlist, String> {
 
-    @Query(value = """
-            SELECT playlist_id
-            FROM (
-                SELECT p.playlist_id, ROW_NUMBER() OVER () AS rownum
-                FROM playlist p
-            ) sub
-            ORDER BY rownum DESC
-            LIMIT 50
-        """, nativeQuery = true)
-    List<String> findPlaylistIdBy();
+//    @Query(value = """
+//            SELECT playlist_id
+//            FROM (
+//                SELECT p.playlist_id, ROW_NUMBER() OVER () AS rownum
+//                FROM playlist p
+//            ) sub
+//            ORDER BY rownum DESC
+//            LIMIT 50
+//        """, nativeQuery = true)
+//    List<String> findPlaylistIdBy();
 }

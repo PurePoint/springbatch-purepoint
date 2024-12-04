@@ -4,9 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.purepoint.youtubebatch.domain.Video;
-import com.purepoint.youtubebatch.playlist.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -27,28 +28,54 @@ public class PlaylistVideoItemReader implements ItemReader<Video> {
     private String apiKey;
     private final WebClient webClient;
     private final List<Video> videos = new ArrayList<>();
-    private final PlaylistRepository playlistRepository;
+    private List<String> playlistIds;
+    private int playlistIdIndex = 0;
     private int nextVideoIndex = 0;
+
+    @BeforeStep
+    public void beforeStep(StepExecution stepExecution) {
+        // JobExecutionContext에서 playlistId를 가져와 설정
+        this.playlistIds = (List<String>) stepExecution.getJobExecution().getExecutionContext().get("playlistIds");
+    }
 
     @Override
     public Video read() throws InterruptedException {
-        if (videos.isEmpty()) {
-            List<String> playlistIds = playlistRepository.findPlaylistIdBy();
+        if (playlistIds == null || playlistIds.isEmpty()) {
+            log.error("Playlist IDs are not available.");
+            return null;
+        }
 
-            for(String playlistId : playlistIds) {
-                fetchPlaylistItemsFromApi(playlistId);
+        // playlistId를 하나씩 처리
+        if (playlistIdIndex < playlistIds.size()) {
+            String playlistId = playlistIds.get(playlistIdIndex);
+            playlistIdIndex++;
+
+            // fetchPlaylistItemsFromApi 메서드 호출 시 playlistId를 매개변수로 전달
+            fetchPlaylistItemsFromApi(playlistId);
+        }
+
+        // 비디오 리스트에서 하나씩 꺼내기
+        Video nextVideo = null;
+        while (nextVideoIndex < videos.size()) {
+            nextVideo = videos.get(nextVideoIndex);
+            nextVideoIndex++;
+
+            // 비디오가 반환되면 종료
+            if (nextVideo != null) {
+                log.info("Returning video: {}", nextVideo);
+                return nextVideo;
             }
         }
 
-        Video nextVideo = null;
-        if (nextVideoIndex < videos.size()) {
-            nextVideo = videos.get(nextVideoIndex);
-            nextVideoIndex++;
-        }
-        return nextVideo;
+        // 비디오 리스트에 더 이상 비디오가 없으면 null 반환
+        log.info("No more videos available.");
+        return null;
     }
 
+
+
     private void fetchPlaylistItemsFromApi(String playlistId) {
+        log.info("Fetching playlist items from YouTube API: " + playlistId);
         String part = "?part=snippet,contentDetails";
         String queryParam = "playlistId=" + playlistId;
         fetchVideosFromApi(part, queryParam, videos);
@@ -84,6 +111,7 @@ public class PlaylistVideoItemReader implements ItemReader<Video> {
             JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
             JsonArray items = jsonResponse.getAsJsonArray("items");
 
+            log.info("items.size(): {}", items.size());
 
             for (int i = 0; i < items.size(); i++) {
                 JsonObject item = items.get(i).getAsJsonObject();
@@ -108,6 +136,8 @@ public class PlaylistVideoItemReader implements ItemReader<Video> {
                     position = snippet.get("position").getAsInt();
                     log.info("position: " + position);
                 }
+
+                log.info("videoId: {}, playlistId: {}, position: {}", videoId, playlistId, position);
 
                 Video video = fetchVideoDetail(videoId, playlistId, position);
                 videos.add(video);

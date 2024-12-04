@@ -37,6 +37,12 @@ public class Playlist {
     @Column(name = "playlist_category")
     private Integer playlistCategory;
 
+    @Column(name = "channel_id")
+    private String channelId;
+
+    @Column(name = "channel_title")
+    private String channelTitle;
+
 //    @OneToMany(mappedBy = "playlist")
 //    private List<Video> videos;  // 여러 개의 Video가 하나의 Playlist에 포함될 수 있음
 

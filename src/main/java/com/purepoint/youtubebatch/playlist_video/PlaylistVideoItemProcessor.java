@@ -26,7 +26,6 @@ public class PlaylistVideoItemProcessor implements ItemProcessor<Video, Video> {
                             .videoThumbnail(existingVideo.getVideoThumbnail())
                             .videoPublishedAt(existingVideo.getVideoPublishedAt())
                             .videoCategory(existingVideo.getVideoCategory())
-                            .videoLikes(existingVideo.getVideoLikes())
                             // 새 데이터로 업데이트
                             .videoPosition(video.getVideoPosition())
                             .playlistId(video.getPlaylistId())

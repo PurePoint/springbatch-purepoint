@@ -61,7 +61,9 @@ public class VideoItemReader implements ItemReader<Video> {
     }
 
     private void fetchVideosFromApi(String query, String queryEx) {
-        String apiUrl = "/youtube/v3/search?part=snippet&videoDuration=medium&type=video&q=" + query + queryEx + "&maxResults=50"
+        String apiUrl = "/youtube/v3/search?part=snippet&videoDuration=medium"
+                + "&type=video&order=relevance"
+                + "&q=" + query + queryEx + "&maxResults=50"
                 + (pageToken != null ? "&pageToken=" + pageToken : "")
                 + "&key=" + apiKey;
 
@@ -99,9 +101,9 @@ public class VideoItemReader implements ItemReader<Video> {
                             ZonedDateTime.parse(snippet.get("publishedAt").getAsString()).toLocalDateTime() : null)
                     // thumbnails 예외처리
                     .videoThumbnail((snippet != null && snippet.has("thumbnails")
-                            && snippet.getAsJsonObject("thumbnails").has("high")
-                            && snippet.getAsJsonObject("thumbnails").getAsJsonObject("high").has("url")) ?
-                            snippet.getAsJsonObject("thumbnails").getAsJsonObject("high").get("url").getAsString() : null)
+                            && snippet.getAsJsonObject("thumbnails").has("medium")
+                            && snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").has("url")) ?
+                            snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get("url").getAsString() : null)
                     .build();
 
 
